@@ -2,10 +2,29 @@
   "name": "faketable",
   "version": "0.1.0",
   "private": true,
+  "main": "./src/index.tsx",
   "dependencies": {
+    "@emotion/core": "^10.0.5",
+    "@emotion/styled": "^10.0.5",
+    "@types/papaparse": "^4.5.5",
+    "@types/react-redux": "^6.0.11",
+    "@types/react-router-dom": "^4.3.1",
+    "@types/recompose": "^0.30.2",
+    "create-emotion-styled": "^9.2.8",
+    "emotion-theming": "^10.0.5",
+    "papaparse": "^4.6.2",
     "react": "^16.7.0",
+    "react-csv": "^1.0.19",
     "react-dom": "^16.7.0",
-    "react-scripts-ts": "3.1.0"
+    "react-emotion": "^10.0.0",
+    "react-redux": "^6.0.0",
+    "react-router-dom": "^4.3.1",
+    "react-scripts-ts": "^4.0.8",
+    "recompose": "^0.30.0",
+    "redux": "^4.0.1",
+    "redux-saga": "^0.16.2",
+    "redux-ts-utils": "^2.0.1",
+    "typeface-roboto": "0.0.54"
   },
   "scripts": {
     "start": "react-scripts-ts start",
@@ -14,10 +33,20 @@
     "eject": "react-scripts-ts eject"
   },
   "devDependencies": {
-    "@types/jest": "^23.3.10",
+    "@types/jest": "^23.3.11",
     "@types/node": "^10.12.18",
     "@types/react": "^16.7.18",
     "@types/react-dom": "^16.0.11",
-    "typescript": "^3.2.2"
-  }
+    "babel-loader": "^8.0.4",
+    "babel-plugin-emotion": "^10.0.5",
+    "csv-loader": "^3.0.2",
+    "typescript": "^3.2.2",
+    "xml-loader": "^1.2.1"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }

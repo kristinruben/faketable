@@ -1,22 +1,32 @@
 import * as React from 'react';
-import './App.css';
+import { RouteComponentProps } from 'react-router-dom';
+import { ThemeProvider } from 'emotion-theming';
+import { theme } from './styled';
+/** @jsx jsx */
+import Faketable from './Faketable';
 
-import logo from './logo.svg';
+export type OwnProps = {
 
-class App extends React.Component {
-  public render() {
+};
+
+
+export type StateProps = {};
+
+export type DispatchProps = {};
+
+export type Props = RouteComponentProps<any> & StateProps & OwnProps & DispatchProps & {};
+
+// export type State = {};
+
+class App extends React.PureComponent {
+  render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.tsx</code> and save to reload.
-        </p>
-      </div>
-    );
+      <ThemeProvider theme={theme}>
+        <Faketable />
+      </ThemeProvider>
+    )
   }
 }
 
 export default App;
+
