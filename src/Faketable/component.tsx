@@ -1,7 +1,6 @@
 import * as React from 'react';
-// import { parse } from 'papaparse';
 import { RouteComponentProps } from 'react-router-dom';
-import { Container, Grid, Headline } from './styles';
+import { Cell, Container, Grid, Headline } from './styles';
 
 export type OwnProps = {
 };
@@ -9,37 +8,25 @@ export type OwnProps = {
 export type StateProps = {
 };
 
-export type DispatchProps = {
-  // downloadAssets(): Action<void>;
-};
-
 export interface OutputProps {
-  draggable: boolean;
-  versionModalOpen: boolean;
-  onDragStart: React.DragEventHandler<HTMLDivElement>;
-  onDragEnd: React.DragEventHandler<HTMLDivElement>;
   onDrop: React.DragEventHandler<HTMLDivElement>;
 }
 
-export type EventHandlers = {
-  onDragStart: React.DragEventHandler<HTMLDivElement>;
-  onDragEnd: React.DragEventHandler<HTMLDivElement>;
-  onDrop: React.DragEventHandler<HTMLDivElement>;
-};
-
-
 export type State = {
-  result: string;
+  currentPage: number;
+  recordsCount: number;
+  result: ReadonlyArray<ReadonlyArray<string>>;
 };
 
-export type Props = RouteComponentProps<{ projectId?: string }>
+export type Props = RouteComponentProps<{}>
   & OwnProps
-  & StateProps
-  & DispatchProps;
+  & StateProps;
 
 export default class Faketable extends React.PureComponent<Props, State> {
   state = {
-    result: '',
+    currentPage: 2,
+    recordsCount: 0,
+    result: [['']],
   };
 
   files: FileList | [] = [];
@@ -53,25 +40,18 @@ export default class Faketable extends React.PureComponent<Props, State> {
     }
   }
 
-  // renderData() {
-  //   if (document.getElementById('input')) {
-  //     // @ts-ignore
-  //     const fileInput = document.getElementById('input').files[0];
-  //     const parsedResults = parse(fileInput, {
-  //       worker: true,
-  //       step: function(results) {
-  //         console.log('Row: ', results.data);
-  //       },
-  //     });
-  //     return (
-  //       parsedResults.data.forEach(datum => (
-  //         <Cell>
-  //           {datum}
-  //         </Cell>
-  //       ))
-  //     );
-  //   }
-  // }
+  componentDidUpdate() {
+    if (this.state.result.length > 0) {
+      this.fetchSites(this.state.result);
+    }
+  }
+
+  componentWillUnmount() {
+    const inputElement: any = document.getElementById('input') || <div>no file found</div>;
+    inputElement.removeEventListener('drop');
+  }
+
+  
 
   ref: React.RefObject<HTMLInputElement> = React.createRef();
 
@@ -81,60 +61,90 @@ export default class Faketable extends React.PureComponent<Props, State> {
       const [file] = Array.from(e.dataTransfer.files);
       console.log(file);
       const reader = new FileReader();
-      // return (
-      //   parsedResults.data.forEach(item => (
-      //     <Cell>
-      //       {item}
-      //     </Cell>
-      //   ))
-      // );
-      reader.onload = (e) => {
+      reader.onload = (e: ProgressEvent) => {
         // @ts-ignore
-        console.log('e.target.result', e.target.result);
-        // @ts-ignore
-        this.setState({ result: e.target.result });
+        const formattedResult = e.target.result
+          .split('\n')
+          .map((element: string) => element.split(','))
+          .splice(0, 500);
+        console.log('formattedResult: ', formattedResult);
+        this.setState({ result: formattedResult });
+        this.setState({ recordsCount: formattedResult.length });
+        // this.setState({ currentPageNumber:  })
       }
-      console.log(file);
       reader.readAsText(file);
-      // readFile('./top-1m.csv', (err, data) => {
-      //   if (err) throw err;
-      //   console.log(data);
-      // });
+      console.log('this.state', this.state);
     }
+  }
+
+  fetchSites = (result: any) => {
+    result.map((row: any) => fetch(`https://${row[1]}`, {
+      headers: {
+        'Access-Control-Allow-Origin': 'http://localhost:3000',
+      },
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw Error(response.statusText);
+        }
+      })
+      .then(myJSON => {
+        console.log(JSON.stringify(myJSON));
+      })
+      .catch(error => console.log(error))
+      );
+    }
+
+  renderHeaders() {
+    return (
+      <React.Fragment>
+        <Cell>
+          Rank
+        </Cell>
+        <Cell>
+          Site
+        </Cell>
+        <Cell>
+          HTTP Response Code
+        </Cell>
+      </React.Fragment>
+    );
+  }
+
+
+  renderContents() {
+    const PAGE_SIZE: number = 50;
+    const { currentPage, result } = this.state;
+    const currentPageStartPosition = (currentPage * PAGE_SIZE) - PAGE_SIZE;
+    const currentPageEndPosition = currentPageStartPosition + PAGE_SIZE;
+
+    const resultsForCurrentPage = result.slice(currentPageStartPosition, currentPageEndPosition);
+    return resultsForCurrentPage.map((row, index) => (
+      <React.Fragment key={index}>
+        <Cell>
+          {row[0]}
+        </Cell>
+        <Cell>
+          {row[1]}
+        </Cell>
+        <Cell>
+          woot
+        </Cell>
+      </React.Fragment>
+    ))
   }
 
   render() {
     return (
       <React.Fragment>
         <Container>
-          <Headline>Faketable Data</Headline>
+          <Headline>Faketable</Headline>
           <form>
-            <input onDrop={this.onDrop} id="input" type="file">
-            
-            </input>
+            <input onDrop={this.onDrop} id="input" type="file" />
           </form>
           <Grid>
-            {/* {this.renderData()} */}
-            {/* <Cell>Id</Cell>
-            <Cell>Full Name</Cell>
-            <Cell>Country</Cell>
-            <Cell>Created at</Cell>
-            <Cell>Email</Cell>
-            <Cell>0</Cell>
-            <Cell>Aaron Kris</Cell>
-            <Cell>Philippines</Cell>
-            <Cell>1991-05-23T14:19:51</Cell>
-            <Cell>Ophelia_Mitchell@karley.name</Cell>
-            <Cell>1</Cell>
-            <Cell>Simeon McLaughlin</Cell>
-            <Cell>Singapore</Cell>
-            <Cell>2012-03-07T00:08:36</Cell>
-            <Cell>Sabrina_Barton@torey.net</Cell>
-            <Cell>2</Cell>
-            <Cell>Kelsie Shanahan</Cell>
-            <Cell>Brazil</Cell>
-            <Cell>1985-03-10T20:13:04</Cell>
-            <Cell>Karianne@salvatore.biz</Cell> */}
+            {this.renderHeaders()}
+            {this.renderContents()}
           </Grid>
         </Container>
       </React.Fragment>

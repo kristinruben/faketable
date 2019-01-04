@@ -13,7 +13,7 @@ export const Grid = styled.div(
   {
     display: 'grid',
     width: '100%',
-    gridTemplateColumns: 'repeat(2, 1fr)',
+    gridTemplateColumns: 'repeat(3, 1fr)',
     borderTop: `1px solid ${theme.lightTheme.secondary}`,
     borderRight: `1px solid ${theme.lightTheme.secondary}`,
     '> span': {
